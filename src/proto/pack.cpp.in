@@ -1,0 +1,91 @@
+//
+// Created by arslan on 30.11.18.
+//
+
+
+//#include "pack.hpp"
+#include <pack.hpp>
+#include "@CMAKE_SOURCE_DIR@/src/ppack.hpp"
+//#include "../../cmake-build-debug-clang-60/src/proto/model.pb.h"
+#include "@CMAKE_SOURCE_DIR@/src/global_include.hpp"
+#include "@PROTO_HDRS@"
+
+
+
+std::string pack_block(const Block &block) {
+
+    proto::File::Block packed_block;
+
+    proto::File::Block::Keys *keys = packed_block.mutable_keys();
+    proto::File::Block::CompressedMessage *compressed_message = packed_block.mutable_compressed_message();
+    proto::File::Block::NoncompressedMessage *noncompressed_message = packed_block.mutable_noncompressed_message();
+
+/*    proto::File::Block::Keys keys;
+    proto::File::Block::CompressedMessage compressed_message;
+    proto::File::Block::NoncompressedMessage noncompressed_message;*/
+
+    packed_block.set_block_len_bytes(block.block_len_bytes);
+
+
+    keys->set_keys_len_bytes(block.keys_len_bytes);
+    keys->set_keys_count(block.keys_count);
+    keys->set_keys_compression_method(block.keys_compression_method);
+    keys->set_keys(block.keys);
+
+    compressed_message->set_message_len(block.message_len);
+    compressed_message->set_shift(block.shift);
+    compressed_message->set_compressed_message(block.compressed_message);
+
+    noncompressed_message->set_message_compression_method(block.message_compression_method);
+    noncompressed_message->set_noncompressed_message(block.noncompressed_message);
+
+
+    return packed_block.SerializeAsString();
+}
+
+
+
+std::string pack_block(
+        uint64_t keys_count,
+        const std::string &keys,
+
+        uint32_t shift,
+        const std::string &compressed_message,
+
+        const std::string &noncompressed_message
+
+) {
+
+/*
+    Block *block = new Block();
+
+    block->keys = keys;
+    block->keys_count = keys_count;
+    block->keys_len_bytes = keys.size();
+    block->keys_compression_method = proto::CompressionMethod::gzip;
+
+    block->shift = shift;
+    block->compressed_message = compressed_message;
+    block->message_len = compressed_message.size();
+
+    block->message_compression_method = proto::CompressionMethod::gzip;
+    block->noncompressed_message = noncompressed_message;
+*/
+
+
+    Block block;
+
+    block.keys = keys;
+    block.keys_count = keys_count;
+    block.keys_len_bytes = keys.size();
+    block.keys_compression_method = proto::CompressionMethod::gzip;
+
+    block.shift = shift;
+    block.compressed_message = compressed_message;
+    block.message_len = compressed_message.size();
+
+    block.message_compression_method = proto::CompressionMethod::gzip;
+    block.noncompressed_message = noncompressed_message;
+
+    return pack_block(block);
+}

@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package proto;
+
+enum CompressionMethod {
+    raw = 0;
+    gzip = 1;
+    bzip2 = 2;
+    sharc = 3;
+}
+
+enum Preprocessor {
+    none = 0;
+    xor = 1;
+}
+
+enum PostBWT {
+    rle12 = 0;
+    dc = 1;
+}
+
+message File {
+
+    Header header = 1;
+    repeated Block compressed_block = 2;
+
+
+    message Header {
+        bytes id = 1;
+        bytes version = 2;
+
+        uint64 blocks_count = 3;
+    }
+
+    message Block {
+        uint64 block_len_bytes = 1;
+        Preprocessor pre = 2;
+        Keys keys = 3;
+        CompressedMessage compressed_message = 4;
+        NoncompressedMessage noncompressed_message = 5;
+
+
+        message Keys {
+            uint64 keys_len_bytes = 1;
+            uint64 keys_count = 2;
+
+            CompressionMethod keys_compression_method = 3;
+
+            bytes keys = 4;
+        }
+
+        message CompressedMessage {
+            uint64 message_len = 1;
+            PostBWT post = 2;
+            uint32 shift = 3;
+            repeated uint32 huffman_codes_lens = 4 [packed=true];
+            bytes compressed_message = 5;
+        }
+
+        message NoncompressedMessage {
+            CompressionMethod message_compression_method = 1;
+            bytes noncompressed_message = 2;
+        }
+    }
+}

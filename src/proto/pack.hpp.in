@@ -1,0 +1,56 @@
+//
+// Created by arslan on 30.11.18.
+//
+
+#ifndef SHARC_PACK_HPP
+#define SHARC_PACK_HPP
+
+//#include "../global_include.hpp"
+//#include "model.pb.h"
+#include "@CMAKE_SOURCE_DIR@/src/global_include.hpp"
+#include "@PROTO_HDRS@"
+
+/*typedef enum {
+    none,
+    zlib,
+    bzip2,
+    sharc
+} CompressionMethod;*/
+
+typedef struct {
+//    Block() = default;
+//    ~Block() = default;
+
+    uint64_t block_len_bytes;
+
+    uint64_t keys_len_bytes;
+    uint64_t keys_count;
+    proto::CompressionMethod keys_compression_method;
+    std::string keys;
+
+    uint64_t message_len;
+    uint32_t shift;
+    std::string compressed_message;
+
+    proto::CompressionMethod message_compression_method;
+    std::string noncompressed_message;
+
+} Block;
+
+
+std::string pack_block(const Block &packed_block);
+
+
+std::string pack_block(
+        uint64_t keys_count,
+        const std::string &keys,
+
+        uint32_t shift,
+        const std::string &compressed_message,
+
+        const std::string &noncompressed_message
+
+        );
+
+
+#endif //SHARC_PACK_HPP
